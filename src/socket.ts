@@ -5,6 +5,7 @@ type User = {
   id: string;
   sid: string;
   role: string;
+  userName:string
 };
 
 export class ServerSocket {
@@ -35,7 +36,7 @@ export class ServerSocket {
 
     socket.on(
       "handshake",
-      (userId, role, callback: (uid: string, users: User[]) => void) => {
+      (userId, role,userName, callback: (uid: string, users: User[]) => void) => {
         console.info("Handshake received from: " + socket.id, userId);
 
         const reconnected = this.users.find((e) => e.sid == socket.id);
@@ -50,7 +51,7 @@ export class ServerSocket {
             return;
           }
         }
-        this.users.push({ id: userId, sid: socket.id, role: role });
+        this.users.push({ id: userId, sid: socket.id, role,userName });
 
         console.info("Sending callback ...");
         callback(userId, this.users);
@@ -67,11 +68,10 @@ export class ServerSocket {
       console.info("Disconnect received from: " + socket.id);
 
       const uid = this.GetUidFromSocketId(socket.id);
-
       if (uid) {
-        this.users = this.users.filter((e) => e.id != uid);
-        this.SendMessage("user_disconnected", this.users, socket.id);
-      }
+        this.SendMessage("user_disconnected", this.users, uid);
+      }      
+      this.users = this.users.filter((e) => e.sid != socket.id);
     });
     //CONFERENCE
     socket.on("coach-request", (conference) => {
@@ -102,24 +102,23 @@ export class ServerSocket {
       });
     });
     //LEAD SHARING
-    socket.on("lead-shared", (userId, leadId, sharedUser) => {
+    socket.on("lead-shared", (userId,agentName,leadId,leadFirstName) => {
       const uid = this.GetSocketIdFromUid(userId);
       this.SendUserMessage("lead-shared-received", uid, {
-        leadId,
-        sharedUser,
-      });
-      socket.emit("lead-shared-received", uid, {
-        leadId,
-        sharedUser,
+        agentName,leadId,leadFirstName
       });
     });
-    socket.on("lead-unshared", (userId, leadId) => {
+    socket.on("lead-unshared", (userId,agentName,leadId,leadFirstName) => {
       const uid = this.GetSocketIdFromUid(userId);
       this.SendUserMessage("lead-unshared-received", uid, {
-        leadId,
+        agentName,leadId,leadFirstName
       });
-      socket.emit("lead-shared-received", uid, {
-        leadId,
+    });
+    //LEAD TRANSFER
+    socket.on("lead-transfered", (userId,agentName,leadId,leadFirstName) => {
+      const uid = this.GetSocketIdFromUid(userId);
+      this.SendUserMessage("lead-transfered-received", uid, {
+        agentName,leadId,leadFirstName
       });
     });
   };
