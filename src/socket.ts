@@ -5,7 +5,7 @@ type User = {
   id: string;
   sid: string;
   role: string;
-  userName:string
+  userName: string;
 };
 
 export class ServerSocket {
@@ -36,7 +36,12 @@ export class ServerSocket {
 
     socket.on(
       "handshake",
-      (userId, role,userName, callback: (uid: string, users: User[]) => void) => {
+      (
+        userId,
+        role,
+        userName,
+        callback: (uid: string, users: User[]) => void
+      ) => {
         console.info("Handshake received from: " + socket.id, userId);
 
         const reconnected = this.users.find((e) => e.sid == socket.id);
@@ -51,7 +56,7 @@ export class ServerSocket {
             return;
           }
         }
-        this.users.push({ id: userId, sid: socket.id, role,userName });
+        this.users.push({ id: userId, sid: socket.id, role, userName });
 
         console.info("Sending callback ...");
         callback(userId, this.users);
@@ -70,7 +75,7 @@ export class ServerSocket {
       const uid = this.GetUidFromSocketId(socket.id);
       if (uid) {
         this.SendMessage("user_disconnected", this.users, uid);
-      }      
+      }
       this.users = this.users.filter((e) => e.sid != socket.id);
     });
     //CONFERENCE
@@ -102,23 +107,46 @@ export class ServerSocket {
       });
     });
     //LEAD SHARING
-    socket.on("lead-shared", (userId,agentName,leadId,leadFirstName) => {
+    socket.on("lead-shared", (userId, agentName, leadId, leadFirstName) => {
       const uid = this.GetSocketIdFromUid(userId);
       this.SendUserMessage("lead-shared-received", uid, {
-        agentName,leadId,leadFirstName
+        agentName,
+        leadId,
+        leadFirstName,
       });
     });
-    socket.on("lead-unshared", (userId,agentName,leadId,leadFirstName) => {
+    socket.on("lead-unshared", (userId, agentName, leadId, leadFirstName) => {
       const uid = this.GetSocketIdFromUid(userId);
       this.SendUserMessage("lead-unshared-received", uid, {
-        agentName,leadId,leadFirstName
+        agentName,
+        leadId,
+        leadFirstName,
       });
     });
     //LEAD TRANSFER
-    socket.on("lead-transfered", (userId,agentName,leadId,leadFirstName) => {
+    socket.on("lead-transfered", (userId, agentName, leadId, leadFirstName) => {
       const uid = this.GetSocketIdFromUid(userId);
       this.SendUserMessage("lead-transfered-received", uid, {
-        agentName,leadId,leadFirstName
+        agentName,
+        leadId,
+        leadFirstName,
+      });
+    });
+    //LEAD ASSISTANT
+    socket.on("lead-assistant-added", (userId, agentName, leadId, leadFirstName) => {
+      const uid = this.GetSocketIdFromUid(userId);
+      this.SendUserMessage("lead-assistant-added-received", uid, {
+        agentName,
+        leadId,
+        leadFirstName,
+      });
+    });
+    socket.on("lead-assistant-removed", (userId, agentName, leadId, leadFirstName) => {
+      const uid = this.GetSocketIdFromUid(userId);
+      this.SendUserMessage("lead-assistant-removed-received", uid, {
+        agentName,
+        leadId,
+        leadFirstName,
       });
     });
   };
