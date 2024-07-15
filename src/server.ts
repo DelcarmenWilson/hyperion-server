@@ -46,6 +46,12 @@ application.get('/socket', (req, res, next) => {
     return res.status(200).json({ hello: 'Entry point working fine!' });
 });
 
+application.post('/message', async (req, res, next) => {
+    const {userId}=await req.body
+    ServerSocket.instance.MessageRecieved(userId)
+    return res.status(200).json({ hello: 'messageRecieved' });
+});
+
 /** Healthcheck */
 application.get('/ping', (req, res, next) => {
     return res.status(200).json({ hello: 'world!' });
