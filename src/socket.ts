@@ -99,31 +99,31 @@ export class ServerSocket {
       });
     });
     socket.on("coach-reject", (userId, coachName, reason) => {
-      const uid = this.GetSocketIdFromUid(userId);
-      this.SendUserMessage("coach-reject-received", uid, {
+      const sid = this.GetSocketIdFromUid(userId);
+      this.SendUserMessage("coach-reject-received", sid, {
         coachName,
         reason,
       });
     });
     //CHAT MESSAGES
     socket.on("chat-message-sent", (userId, message) => {
-      const uid = this.GetSocketIdFromUid(userId);
-      this.SendUserMessage("chat-message-received", uid, {
+      const sid = this.GetSocketIdFromUid(userId);
+      this.SendUserMessage("chat-message-received", sid, {
         message,
       });
     });
     //LEAD SHARING
     socket.on("lead-shared", (userId, agentName, leadId, leadFirstName) => {
-      const uid = this.GetSocketIdFromUid(userId);
-      this.SendUserMessage("lead-shared-received", uid, {
+      const sid = this.GetSocketIdFromUid(userId);
+      this.SendUserMessage("lead-shared-received", sid, {
         agentName,
         leadId,
         leadFirstName,
       });
     });
     socket.on("lead-unshared", (userId, agentName, leadId, leadFirstName) => {
-      const uid = this.GetSocketIdFromUid(userId);
-      this.SendUserMessage("lead-unshared-received", uid, {
+      const sid = this.GetSocketIdFromUid(userId);
+      this.SendUserMessage("lead-unshared-received", sid, {
         agentName,
         leadId,
         leadFirstName,
@@ -131,8 +131,8 @@ export class ServerSocket {
     });
     //LEAD TRANSFER
     socket.on("lead-transfered", (userId, agentName, leadId, leadFirstName) => {
-      const uid = this.GetSocketIdFromUid(userId);
-      this.SendUserMessage("lead-transfered-received", uid, {
+      const sid = this.GetSocketIdFromUid(userId);
+      this.SendUserMessage("lead-transfered-received", sid, {
         agentName,
         leadId,
         leadFirstName,
@@ -140,16 +140,16 @@ export class ServerSocket {
     });
     //LEAD ASSISTANT
     socket.on("lead-assistant-added", (userId, agentName, leadId, leadFirstName) => {
-      const uid = this.GetSocketIdFromUid(userId);
-      this.SendUserMessage("lead-assistant-added-received", uid, {
+      const sid = this.GetSocketIdFromUid(userId);
+      this.SendUserMessage("lead-assistant-added-received", sid, {
         agentName,
         leadId,
         leadFirstName,
       });
     });
     socket.on("lead-assistant-removed", (userId, agentName, leadId, leadFirstName) => {
-      const uid = this.GetSocketIdFromUid(userId);
-      this.SendUserMessage("lead-assistant-removed-received", uid, {
+      const sid = this.GetSocketIdFromUid(userId);
+      this.SendUserMessage("lead-assistant-removed-received", sid, {
         agentName,
         leadId,
         leadFirstName,
@@ -160,8 +160,8 @@ export class ServerSocket {
   GetUidFromSocketId = (sid: string) => {
     return this.users.find((e) => e.sid == sid)?.id;
   };
-  GetSocketIdFromUid = (id: string) => {
-    return this.users.find((e) => e.id == id)?.sid;
+  GetSocketIdFromUid = (uid: string) => {
+    return this.users.find((e) => e.id == uid)?.sid;
   };
 
   SendMessage = (name: string, users: User[], payload?: Object) => {
