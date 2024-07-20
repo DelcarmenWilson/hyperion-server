@@ -27,12 +27,10 @@ application.use(express.json());
 
 /** Rules of our API */
 application.use((req, res, next) => {
-<<<<<<< HEAD
-    res.header('Access-Control-Allow-Origin', 'https://hperioncrm.com');
-    res.setHeader("Access-Control-Allow-Origin", 'https://hperioncrm.com');
-=======
+
     res.header('Access-Control-Allow-Origin', '*');
->>>>>>> zustand
+    
+    res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 
     if (req.method == 'OPTIONS') {
