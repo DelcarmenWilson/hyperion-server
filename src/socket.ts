@@ -30,10 +30,26 @@ export class ServerSocket {
 
     this.io.on("connect", this.StartListeners);
   }
-  MessageRecieved=(userId:string)=>{
-    const uid = this.GetSocketIdFromUid(userId);
-    this.SendUserMessage("lead-message-recieved", uid);
-}
+  Actions = (userId: string, type: string, dt: any, dt1: any) => {
+    
+    const sid = this.GetSocketIdFromUid(userId);
+    switch (type) {
+      case "conversation:updated":
+        this.SendUserMessage("conversation-updated-recieved", sid, {
+          dt,
+        });
+        this.SendUserMessage("conversation-message-notify", sid);
+        break;
+        case "conversation-messages:new":
+        this.SendUserMessage("conversation-messages-new", sid, {
+          dt
+        });
+        break
+        case "calllog:new":
+          this.SendUserMessage("calllog-new", sid,{dt});
+        break;
+    }
+  };
   StartListeners = (socket: Socket) => {
     console.info("Message received from " + socket.id);
 
@@ -78,7 +94,7 @@ export class ServerSocket {
       console.info("Disconnect received from: " + socket.id);
 
       const uid = this.GetUidFromSocketId(socket.id);
-      if (uid) {        
+      if (uid) {
         //logoff(uid)
         this.SendMessage("user_disconnected", this.users, uid);
       }
@@ -130,31 +146,40 @@ export class ServerSocket {
       });
     });
     //LEAD TRANSFER
-    socket.on("lead-transfered", (userId, agentName, leadIds, leadFirstName) => {
-      const sid = this.GetSocketIdFromUid(userId);
-      this.SendUserMessage("lead-transfered-received", sid, {
-        agentName,
-        leadIds,
-        leadFirstName,
-      });
-    });
+    socket.on(
+      "lead-transfered",
+      (userId, agentName, leadIds, leadFirstName) => {
+        const sid = this.GetSocketIdFromUid(userId);
+        this.SendUserMessage("lead-transfered-received", sid, {
+          agentName,
+          leadIds,
+          leadFirstName,
+        });
+      }
+    );
     //LEAD ASSISTANT
-    socket.on("lead-assistant-added", (userId, agentName, leadId, leadFirstName) => {
-      const sid = this.GetSocketIdFromUid(userId);
-      this.SendUserMessage("lead-assistant-added-received", sid, {
-        agentName,
-        leadId,
-        leadFirstName,
-      });
-    });
-    socket.on("lead-assistant-removed", (userId, agentName, leadId, leadFirstName) => {
-      const sid = this.GetSocketIdFromUid(userId);
-      this.SendUserMessage("lead-assistant-removed-received", sid, {
-        agentName,
-        leadId,
-        leadFirstName,
-      });
-    });
+    socket.on(
+      "lead-assistant-added",
+      (userId, agentName, leadId, leadFirstName) => {
+        const sid = this.GetSocketIdFromUid(userId);
+        this.SendUserMessage("lead-assistant-added-received", sid, {
+          agentName,
+          leadId,
+          leadFirstName,
+        });
+      }
+    );
+    socket.on(
+      "lead-assistant-removed",
+      (userId, agentName, leadId, leadFirstName) => {
+        const sid = this.GetSocketIdFromUid(userId);
+        this.SendUserMessage("lead-assistant-removed-received", sid, {
+          agentName,
+          leadId,
+          leadFirstName,
+        });
+      }
+    );
   };
 
   GetUidFromSocketId = (sid: string) => {
