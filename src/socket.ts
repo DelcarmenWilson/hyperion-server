@@ -100,6 +100,13 @@ export class ServerSocket {
       }
       this.users = this.users.filter((e) => e.sid != socket.id);
     });
+    //GROUP MESSAGE
+    socket.on("group-message-sent", (message) => {
+      const uid = this.GetUidFromSocketId(socket.id);
+      const username=this.users.find(e=>e.id==uid)?.userName
+      const users = this.users.filter((e) => e.id != uid);
+      this.SendMessage("group-message-received", users, { message,username });
+    });
     //CONFERENCE
     socket.on("coach-request", (conference) => {
       const uid = this.GetUidFromSocketId(socket.id);
